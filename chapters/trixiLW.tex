@@ -1,10 +1,60 @@
 \documentclass[12pt]{article}
+\usepackage[a4paper, width=150mm,top=25mm,bottom=25mm]{geometry}
 \usepackage{amsmath}
 \usepackage{amsfonts}
-%\usepackage{minted}
-%\usepackage{hvpygmentex}
+\usepackage{hyperref}
+\usepackage{minted}
+\usepackage{listings}
+
+\lstset{basicstyle=\ttfamily}
 
 \begin{document}
-\section{TrixiLW.jl}
-This chapter introduces the a numerical simulation framework for hyperbolic conservation laws based on rixi.jl package written in  It supports $2D$ simulations on cartesian, curvilinear and structured meshes. mmmk
+\section{Simulation of Conservation laws}
+\subsection{Trixi.jl}
+\href{https://github.com/trixi-framework/Trixi.jl}{\lstinline[language=Python]|Trixi.jl|} is a numerical simulation framework for conservation laws written in 
+\lstinline[language=Python]|Julia|.
+\subsection{Features of {\ttfamily Trixi.jl}}
+
+\lstinline[language=Python]|Trixi.jl| package can be used for conservation laws in $1$D, $2$D and $3$D dimensions with the following features:
+\begin{itemize}
+    \item Support cartesian and curvilinear meshes.
+    \item Structured and Unstructured meshes.
+    \item AMR and Shock capturing.
+    \item High-order accuracy in space and time.
+    \item Discontinuous Galerkin methods.
+    \item CFL-based and error-based time step control.
+    \item Periodic and weakly-enforced boundary conditions.
+\end{itemize}
+{\ttfamily Trixi.jl} has multiple governing equations such as {\ttfamily Compressible Euler, Compressible Navier-Stokes, Shallow water equations} etc.
+The code written in this package also have support for {\ttfamily shared memory} parallelization via {\ttfamily multi-threading} and {\ttfamily multi-node} parallelization
+via  {\ttfamily Message Passing Interface (MPI)}. It also provides visualization and post-processing support for the results.
+
+It uses $Runge-Kutta$ methods for discretization in time with other high-orders for space discretization.
+
+\subsection{{\ttfamily TrixiLW.jl}}
+In {\ttfamily TrixiLW}, we have extended the {\ttfamily Trixi} package to use $Lax-Wendroff~flux\\reconstruction$ method for time discretization instead of $RK$ methods. 
+
+\subsubsection{Features of {\ttfamily TrixiLW}}
+{\ttfamily TrixiLW} can be used for conservation laws in $2$D with the following features:
+\begin{itemize}
+    \item Support for cartesian and curvilinear meshes.
+    \item Structured and Unstructured meshes.
+    \item High-order accuracy in space and time.
+    \item Discontinuous Galerkin methods.
+    \item CFL-based and error-based time step control.
+    \item Periodic and non-periodic boundary conditions.
+    \item AMR and Shock capturing
+\end{itemize}
+This package also supports {\ttfamily shared memory} parallelization via {\ttfamily multi-threading} and {\ttfamily multi-node} parallelization via {\ttfamily Message Passing
+Interface (MPI)}. For visualization and post-processing, we use the tools of {\ttfamily Trixi} itself.
+
+\subsubsection{{\ttfamily Multi-node} parallelization of {\ttfamily TrixiLW}}
+{\ttfamily Multi-node} parallelization implies that we can use the computing units that not present on a single node on which the program is running. This can help us encounter
+the issue of insufficient memory on a single node. We, now, can use memory of other nodes which are connected to each other via channel-based fabric such as {\ttfamily InfiniBand}
+that facilitates high-speed communication between interconnected nodes. 
+
+Although, using {\ttfamily multi-node} parallelization can also creates a communication overhead for the running program yet it is used since their is a nice trade-off between
+the overhead created due to communication and other aspects such as memory, computing power, data storage etc. 
+
+
 \end{document}

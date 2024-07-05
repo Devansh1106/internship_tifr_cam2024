@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[12pt]{article}
 % \usepackage[utf8]{inputenc} 
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -81,5 +81,20 @@ where $\lambda$'s are the $eigenvalues$ of a matrix $A$, in the case of system o
 
 For a three point stencil the CFL condition leads to $v \leq 1$. It can be noted that for a wider stencils, the CFL condition can give $v \leq 2$. The CFL condition is a $necessary$ but not a sufficient condition for stability of the solution.
 \subsection{Rusanov's flux: A stable numerical flux}
+
+\subsection{Lax-Wendroff method}
+Lax-wendroff method is a numerical method for solving system of hyperbolic conservation laws. It is a second order accurate method in both space and time. This method can be derived using
+$Taylor's~expansion.$ We will demonstrate the derivation of this method for $linear~advection~equation$ in $1$D:
+\begin{equation} \label{9}
+    u_t + au_x = 0
+\end{equation}
+The $Taylor's~expansion$ in $1$D looks like:
+\begin{equation}
+    u_j^{n+1} = u_j^n + \Delta t \frac{\partial u}{\partial t}\bigg\vert_j^n + \frac{(\Delta t)^2}{2}\frac{\partial^2 u}{\partial t^2}\bigg\vert_j^n + \dots
+\end{equation}
+From eq (\ref{9}), we can write $ u_t = -au_x$ and for $u_{tt}$ we can differentiate eq (\ref{9}):
+\begin{equation}
+    u_{tt} = 
+\end{equation}
 
 \end{document}

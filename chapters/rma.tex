@@ -1,0 +1,42 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\begin{document}
+\section{Remote Memory Access: MPI 3.0}
+In the reign of parallel computing, there exist two major approaches for communicating data between processes:
+message passing and direct memory access of the remote process. Shared memory approach is also there but that 
+is limited to the procesess on the same node. 
+
+MPI-1 provides a way for message passing between processes while MPI-2 gives approach for direct memory access
+of remote processes and MPI-3 extends it to a great extent. MPI RMA uses operations like \textit{put}, \textit{get}
+and \textit{accumulate} to \textit{write}, \textit{read} and \textit{reduce} data respectively to a remote process 
+without involving the remote process. One limitation of RMA approach is this it require special hardware support
+but with increasingly high development in networking caters this need to much extent.
+
+\subsection{Shared memory Vs RMA}
+MPI remote memory access must be distinguished from shared memory programming model in the following ways:
+\begin{itemize}
+    \item MPI RMA approach can be used for communication between cores on the same node as well as cores on different
+    nodes. While shared memory approach is limited to processes on the same core using \textit{threads}.
+    \item In shared memory, we have a single address space, shared by multiple threads of execution while in RMA, programmer
+    decides how much memory will be exposed to the remote process for communication. 
+\end{itemize}
+The major disadvantage of shared memory model is \textit{simultaneous access by different threads to a same memory location.}
+In order to avoid this race condition, many sophisticated techniques in compilers and special routines are needed such as 
+\textit{locks and mutexes.}
+
+\section{Introduction to RMA}
+In traditional message passing, one process \textit{sends} data to other process using {\ttfamily MPI\_Send} and other 
+process \textit{receives} data using {\ttfamily MPI\_Recv}. Every \textit{send} is compulsory to have a \textit{receive}
+at the receiver process. This cooperative nature of MPI can impose order into delivery of data and that will have 
+performance costs due to overheads.
+
+MPI RMA provides the way of data communication from \textit{origin process} (process that sends data) to the \textit{target
+process} (process to which data has been sent), without the involvement of \textit{target process}. The calling process specifies
+both send and receive buffer. Since a single call is used, these routines are also called \textit{one-sided routines}:
+
+There are three main steps in using RMA:
+\begin{itemize}
+    \item Defining a memory window.
+\end{itemize}
+
+\end{document}
