@@ -1,5 +1,7 @@
 \documentclass[12pt]{article}
 \usepackage{graphicx}
+\usepackage{listings}
+
 \begin{document}
 \section{Remote Memory Access: MPI 3.0}
 In the reign of parallel computing, there exist two major approaches for communicating data between processes:
@@ -27,16 +29,56 @@ In order to avoid this race condition, many sophisticated techniques in compiler
 \section{Introduction to RMA}
 In traditional message passing, one process \textit{sends} data to other process using {\ttfamily MPI\_Send} and other 
 process \textit{receives} data using {\ttfamily MPI\_Recv}. Every \textit{send} is compulsory to have a \textit{receive}
-at the receiver process. This cooperative nature of MPI can impose order into delivery of data and that will have 
-performance costs due to overheads.
+at the receiver process. This cooperative nature of MPI can impose order or need \textit{tag} matching for delivery of data
+and that will have performance costs due to overheads.
 
-MPI RMA provides the way of data communication from \textit{origin process} (process that sends data) to the \textit{target
+MPI RMA provides a way of data communication from \textit{origin process} (process that sends data) to the \textit{target
 process} (process to which data has been sent), without the involvement of \textit{target process}. The calling process specifies
-both send and receive buffer. Since a single call is used, these routines are also called \textit{one-sided routines}:
+both send and receive buffer. Since a single process is involved, these routines are also called \textit{one-sided routines}:
 
 There are three main steps in using RMA:
 \begin{itemize}
-    \item Defining a memory window.
+    \item \textbf{Defining a memory window:}\\
+    Memory \textit{window} is collection of memory locations defined by a group of processes and only those locations can be
+    modified by the remote process using RMA operations. This involves creation of a new MPI object {\ttfamily MPI\_Win}. There
+    are $4$ window creation routines specified by MPI Forum.
+    \item \textbf{Moving the data from \textit{origin} to \textit{target} process:}\\
+    There are several routines to move the data between processes without the involve of the process instead directly writing the
+    data into remote processes memory. These routines include: {\ttfamily MPI\_Put, MPI\_Get, MPI\_Accumulate} etc.
+    \item \textbf{Specifying how do we know that data is available to remote process:}\\
+    This is to say that how do we know that receive has been completed? There are several routines such as {\ttfamily MPI\_Win\_fence,
+    MPI\_Win\_lock/unlock} etc. that makes sure that data is available to the target process for its local load/store operations.     
+\end{itemize}
+
+\subsection{Memory Window}
+It is the memory region of a process that can be accessed by another process using RMA operations. All or a group of processes can 
+create a window or many windows by contributing some part of their memory to the window. It is a contiguous section of memory. There
+are these $4$ window creation routines:
+\begin{itemize}
+    \item {\ttfamily MPI\_Win\_allocate:} In this routine memory allocation and window creation both are handled by MPI implemention.
+    \item {\ttfamily MPI\_Win\_create:} This routine creates the window from already allocate memory. User have to provide some allocated
+    memory to be create as a window.
+    \item {\ttfamily MPI\_Win\_allocate\_shared:} This routine helps in creating a shared memory window from already allocate memory for
+    the process on the same node hence these process can access each other data with simple load/store and avoid communication completely.
+    \item {\ttfamily MPI\_Win\_create\_dynamic:} It creates a window but does not attach memory directly to it. Memory can be attached later
+    using {\ttfamily MPI\_Win\_attach} and can be deattached using {\ttfamily MPI\_Win\_deattach}. 
+\end{itemize}
+
+By default, the memory that has been allocated by MPI implemention (if user specifies so) is {ttfamily contiguous} unless the
+the {\ttfamily non-contiguous} option is {\ttfamily true.} This can have performance implications as well since {\ttfamily non-contiguous}
+memory can be allocated aligning to the cache sizes which will decrease the number of cache misses.
+
+After all the communication has been done and window is no longer required, it can be free using {\ttfamily MPI\_Win\_free} by all the 
+processes that have created the window. 
+% \begin{minted}{python}
+    % int MPLWin_create(void *base, MPI_Aint size, int disp_unit, MPUnfo info,
+    % MPI_Comm comm, MPI_Win *win)
+    % int MPLWin_free(MPI_Win *win)
+% \end{minted}
+
+There are few interesting parameters that are required by window calling routines:
+\begin{itemize}
+    \item \textbf{disp\_unit:} This argument unit should be the multiple of `sizeof()` of simple type such as `int` etc. that create up the window object.
 \end{itemize}
 
 \end{document}
