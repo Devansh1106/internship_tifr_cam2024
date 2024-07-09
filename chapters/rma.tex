@@ -1,6 +1,8 @@
 \documentclass[12pt]{article}
 \usepackage{graphicx}
 \usepackage{listings}
+\usepackage[draft]{minted}
+\usepackage{fancyhdr}
 
 \begin{document}
 \section{Remote Memory Access: MPI 3.0}
@@ -69,16 +71,90 @@ the {\ttfamily non-contiguous} option is {\ttfamily true.} This can have perform
 memory can be allocated aligning to the cache sizes which will decrease the number of cache misses.
 
 After all the communication has been done and window is no longer required, it can be free using {\ttfamily MPI\_Win\_free} by all the 
-processes that have created the window. 
-% \begin{minted}{python}
-    % int MPLWin_create(void *base, MPI_Aint size, int disp_unit, MPUnfo info,
-    % MPI_Comm comm, MPI_Win *win)
-    % int MPLWin_free(MPI_Win *win)
-% \end{minted}
-
+processes that have created the window.\\
+\hrule
+\begin{figure}[!ht]
+\begin{minted}{Julia}
+int MPI_Win_create(void *base, MPI_Aint size, int disp_unit,
+                 MPI_nfo info, MPI_Comm comm, MPI_Win *win)
+int MPLWin_free(MPI_Win *win)
+\end{minted}
+\caption{Syntax for C}
+\end{figure}
+\hrule
+\vspace{10pt}
 There are few interesting parameters that are required by window calling routines:
 \begin{itemize}
-    \item \textbf{disp\_unit:} This argument unit should be the multiple of `sizeof()` of simple type such as `int` etc. that create up the window object.
+    \item \textbf{disp\_unit:} This argument unit should be the multiple of {\ttfamily sizeof()} of simple type such as `int` etc.
+    that creates up the window object. For example if an array of {\ttfamily Floats} is making up the window then {\ttfamily disp\_unit}
+    should be multiple of {\ttfamily sizeof(Float)}. This is the local unit size for displacements, in bytes.
+    \item \textbf{info:} This arguemnt of only used for optimization purposes. A value {\ttfamily MPI\_INFO\_NULL} is always valid.
 \end{itemize}
+
+\subsection{Moving Data}
+Since we have now seen how to make memory as a window for RMA opertaions, we need to specify how to move data between process.
+MPI provides several routines to specify what data to move and to which location. Three of the simplest routines have been
+described below:
+\subsubsection{{\ttfamily MPI\_Put}}
+{\ttfamily MPI\_Put} is like a "store/write to remote memory" operation. It is a non-blocking communicating routine. This routines 
+writes data from {\ttfamily origin} process's memory called {\ttfamily origin address} to {\ttfamily remote} process's memory at
+the location as described by {\ttfamily displacement} argument. The data that need to be moved can be anywhere in the {\ttfamily origin}
+process's memory, it need not to be inside a window.
+
+Programmer need to pay attention while providing the {\ttfamily displacement} argument. \textbf{The destination of data is always relative
+to the memory window exclusive to {\ttfamily remote} process not with the whole window object}.
+
+MPI RMA operations define a separation between moving of data and completion of the operations. Window ~synchronization ~routines ~such as
+{\ttfamily MPI\_Win\_fence} should be used after RMA opertions for completion of these operations. Between two {\ttfamily MPI\_Win\_fence} calls
+any number of {\ttfamily MPI\_Put} operations can be issued. But if a {\ttfamily MPI\_Put} and {\ttfamily MPI\_Accumulate} operation overlaps (issued 
+to same memory location) between two {\ttfamily MPI\_Win\_fence} calls then result will be {\ttfamily undefined behaviour.} Along with that,
+{\ttfamily MPI\_Put} and {\ttfamily MPI\_Get} both can not be used within two {\ttfamily MPI\_Win\_fence} calls.
+
+{\ttfamily MPI\_Put} is \textbf{not} an atomic operation. An \textbf{atomic operation} is an operation that can be completed within one CPU cycle and
+hence these operation can not be interrupted in between by any other process. They execute at lowest level and cannot be broken further.
+\begin{figure}[!ht]
+\hrule \vspace{5pt}
+\begin{minted}{Julia}
+int MPI_Put(const void *origin_addr,
+            int origin_count, MPI_Datatype origin_datatype, int
+            target_rank, MPI_Aint target_disp, int target_count,
+            MPI_Datatype target_datatype, MPI_Win win)
+\end{minted}
+\hrule
+\caption{Syntax for C}
+\end{figure}
+
+\subsubsection{{\ttfamily MPI\_Get}}
+{\ttfamily MPI\_Get} routine is used to get data from remote process to the calling process. It can get data from remote process's window to anywhere 
+in the origin (calling) process memory means {\ttfamily origin\_addr} need not to be inside window for calling process. This operation is also not an
+\textbf{atomic} operation.\\
+While calling this routine, programmer needs to specify the {\ttfamily displacement} argument relative to the window exclusive to the remote process.
+
+This displacement arguement will specify the location of the data at remote process that needs to be written at the origin process's memory. After
+using this routine, there should be a call to a window synchronization routine to ensure that the data has been received at the origin process.
+\begin{figure}[!ht]
+\hrule \vspace{5pt}
+\begin{minted}{Julia}
+int MPI_Get(void *origin_addr, int origin_count, 
+            MPI_Datatype origin_datatype, int target_rank,
+            MPI_Aint target_disp, int target_count,
+            MPI_Datatype target_datatype, MPI_Win win)
+\end{minted}
+\hrule
+\caption{Syntax for C}
+\end{figure}
+
+\subsubsection{{\ttfamily MPI\_Accumulate}}
+{\ttfamily MPI\_Accumulate} routine provides a way to move and combine data at the target process using any of the reduction operations such as
+{\ttfamily MPI\_SUM, MPI\_MAX} etc. It can be seen similar to {\ttfamily MPI\_Reduce} operation but without the involvement of target process. There
+are few restrictions for using {\ttfamily MPI\_Accumulate} as listed below:
+\begin{itemize}
+    \item It allows \textbf{only predefined operations} such as {\ttfamily MPI\_SUM, MPI\_MAX, MPI\_MIN, MPI\_LAND, MPI\_LOR} etc.
+    \item It allows only \textbf{predefined} MPI datatypes and MPI derived datatypes where all components are of same predefined datatype.
+\end{itemize}
+\subsubsection{{\ttfamily MPI\_Accumulate as MPI\_Put}}
+Since {\ttfamily MPI\_Accumulate} is an atomic operation while {\ttfamily MPI\_Put} is not an atomic operation. Hence if we want to use atomic
+{\ttfamily  MPI\_Put} we can achieve this using {\ttfamily MPI\_Replace} as an operation of {\ttfamily MPI\_Accumulate}. This will replace the  
+
 
 \end{document}
