@@ -1,1 +1,35 @@
 \section{Introduction}
+Lax-Wendroff Flux Reconstruction (LWFR) is a high order, explicit spectral element method for solving systems of partial differential equations in cosservative form. 
+\begin{equation}
+    \boldsymbol{u}_t + \nabla_x \cdot \boldsymbol{f^a(u)} - \nabla_x \cdot \boldsymbol{f^v}(\boldsymbol{u},\nabla \boldsymbol{u}) = \boldsymbol{S(u)}
+\end{equation}
+An example of above system is the \href{https://en.wikipedia.org/wiki/Navier%E2%80%93Stokes_equations}{compressible Navier-Stokes equations.} Traditional spectral element methods for solving these equations are the Runge-Kutta Flux Reconstruction (RKFR) schemes which perform a spatial discretization (i.e., in x) and then use a \textbf{multi-stage} Runge-Kutta ODE solver to perform time discretization (i.e., in t). The Runge-Kutta method requires multiple inter-element communication for each of its stages which can become the bottleneck, especially in a parallel code.  
+
+Lax-Wendroff Flux Reconstruction (LWFR) schemes are an alternative to this as they perform the evolution in a single stage, thus decreasing the inter-element communication. The main goal while writing parallel algorithm should be to minimize the data to be communicated without creating redundant data in each process's memory. 
+
+Using parallel algorithms has its own advantages and disadvantages but the gain that we acquire is far more than the loss for data and compute intensive problems.
+\subsection{Advantages}
+\begin{itemize}
+    \item Execution of code on many nodes each with its own computing units enables to use extra compute.
+    \item Execution of memory intensive programs on a multi-node environment enables it to use memeory available on each node.
+    \item Using multiple cores on many nodes can speed up the process and can save time.
+\end{itemize}
+
+\subsection{Disadvantages}
+\begin{itemize}
+    \item Execution of code in an multi-node environment requires a lot of resources such as computing units, interconnects, networking hardwares etc.
+    \item Data communication between processes puts a additional overhead to the execution time which can be significant if code is not written efficiently.
+    \item It increases the complexity of program hence not suitable for common users.
+\end{itemize}
+In chapter \ref{tf}, we will discuss the theoritical framework for LWFR method. I have also included finite volume method (FVM) as background for the LWFR as knowing about FVM can be very helpful to comprehend flux reconstruction method.
+
+\vspace{5pt}In chapter \ref{m}, I have explained the methodology of how parallelization of {\ttfamily TrixiLW.jl} has been done. I also have mentioned about the data structures that has been used for parallelization.
+Along with the methodology that we have followed, I have also provided a alternate way of parallelization using the newly released MPI Remote memory access (RMA).
+
+\vspace{5pt}In chapter \ref{ai}, I have performed analysis of solutions and provided a possible interpretation of results.
+
+\vspace{5pt}In later chapters \ref{c} and \ref{ra}, the conclusion and the results that we got from the code along with results of scaling tests are given.
+
+\begin{center}
+    \rule{3cm}{1pt}
+\end{center}

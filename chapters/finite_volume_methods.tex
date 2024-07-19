@@ -1,4 +1,4 @@
-\section{Finite Volume Methods}
+\section[Finite Volume]{Finite Volume Methods}
 \subsection{Motivation for Finite Volume Method}
 In finite difference methods, the derivatives are approximated by finite differences -- esssentially using Taylor expansion. A large discussion on finite difference  methods shows that they need the solution to be smooth and equation to be satisfied point-wise. However, the solutions to the scalar conservation law (\ref{1}) are not necessarily smooth, so the Taylor expansion -- replacing derivatives using finite differences -- is no longer valid. Hence, we need a new framework for designing numerical methods for scalar conservation laws.
 
@@ -51,7 +51,7 @@ F_{i-1/2}^n  =  \frac{1}{\Delta t} \int_{t_n}^{t_{n+1}} f(u(x_{i-1/2},t_n)) dt
 \end{equation*}
 If we can approximate this \textit{average flux} function based on the values of $U^n$, then we will have a discrete method. And that approximation to \textit{average flux}  function is called \textit{numerical flux function}.
 
-\subsection{The CFL Condition}
+\subsection{The CFL Condition} \label{cfl}
 The \textit{numerical flux} function as the approximation of \textit{average flux} is the main ingredient in a finite volume scheme. We need a approximation to:
 \begin{equation}
 \bar{F}^n_{j+1/2} \approx F^n_{i-1/2} =  \frac{1}{\Delta t}\int_{t_n}^{t^{n+1}} f(u(x_{i-1/2}, t_n)) dt
@@ -74,7 +74,35 @@ v = \frac{\Delta t}{\Delta x} \max_p\mid\lambda^p\mid
 where $\lambda$'s are the $eigenvalues$ of a matrix $A$, in the case of system of linear hyperbolic equations and $\lambda$ can be the wave propogation speed in the case of a single hyperbolic PDE.
 
 For a three point stencil the CFL condition leads to $v \leq 1$. It can be noted that for a wider stencils, the CFL condition can give $v \leq 2$. The CFL condition is a $necessary$ but not a sufficient condition for stability of the solution.
-\subsection{Rusanov's flux: A stable numerical flux}
+\subsection{Rusanov's flux}
+Rusanov scheme \cite{rusanov} is also called {\em local Lax-Friedrich scheme} \cite{notes_ncm} because it can be obtained from a simple modification in {\em Lax-Friedrich scheme} basically using different approach in choosing the parameter $\lambda$. \vspace{8pt}
+\hrule \vspace{10pt}
+\hspace{-17pt}\textbf{A Note about Lax-Friedrich scheme}\\
+Lax-Friedrich scheme has this structure:
+\begin{equation}
+    f_{j+1/2} = \frac{1}{2}\left(f_j + f_{j+1} \right) - \frac{1}{2}\lambda \left(u_{j+1} - u_j \right) \hspace{20pt} \lambda = \frac{\Delta x}{\Delta t}
+\end{equation} 
+The time step must satisfy the CFL condition \ref{cfl}, we can write time step $\Delta t$ as:
+\begin{equation*}
+    \Delta t = CFL\frac{\Delta x}{\max\limits_{j} \sigma(f'(u_j^n))}, \hspace{10pt} CFL \leq 1
+\end{equation*}
+where $\sigma$ is the {\em spectral radius}. We see that
+\begin{equation*}
+    \lambda \approx \max\limits_j \sigma(f'(u_j^n))
+\end{equation*}
+The parameter $\lambda$ is related to the maximum wave speed in the whole computational domain. The only problem with this scheme is this the results will be very {\em diffusive} and shocks are smeared to a considerable extent.
+\vspace{5pt} \hrule \vspace{5pt}
+In Rusanov's scheme, instead of global maximum we use local estimate of $\lambda$ and hence the flux has the form
+\begin{equation}
+    f_{j+1/2} = \frac{1}{2}(f_j + f_{j+1}) - \frac{1}{2} \lambda_{j+1/2}(u_{j+1} - u_j)
+\end{equation}
+where $\lambda_{j+1/2}$ is an estimate of the maximum wave speed arising in the Riemann problem at the face $j+1/2$. For Euler equations
+\begin{equation*}
+    \lambda_{j+1/2} = \max\{|u_j| + a_j, |u_{j+1}| + a_{j+1}\}
+\end{equation*} is a good choice.
+
+\subsection{Flux Reconstruxtion}
+
 
 \subsection{Lax-Wendroff method}
 Lax-wendroff method is a numerical method for solving system of hyperbolic conservation laws. It is a second order accurate method in both space and time. This method can be derived using
