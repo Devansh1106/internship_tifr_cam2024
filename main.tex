@@ -1,22 +1,60 @@
 
 \documentclass[12pt]{report}
+\usepackage[a4paper, width=150mm,top=25mm,bottom=25mm]{geometry}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[cache=false, outputdir=aux]{minted}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\setlength{\headheight}{14.49998pt}
+
+
 \title{
 {\textbf{Internship Report}}\\
 {\large IISER Thiruvananthapuram,}\\{\large Kerala, India}\\{\small by}
 }
 \author{Devansh Tripathi\\ [1 cm]{\textbf{Supervisor:}}\\{ Prof. Praveen Chandrashekar}\\{TIFR-CAM,}\\{Bangalore, India}}
-\date{}
+\date{\today}
 \begin{document}
 
 \maketitle
 \chapter*{Acknowledgement}
 I would like to ...
+
+\title
 \tableofcontents
+\chapter*{Aim of the project}
+\input{chapters/aim.tex}
 
+\chapter{Introduction}
+\input{chapters/introduction.tex}
+\input{chapters/finite_volume_methods.tex}
 
+\chapter{Theoritical framework}
+\input{}
 
+\chapter{Profile of Organisation}
+\input{}
+
+\chapter{Methodology}
+\input{}
+
+\chapter{Analysis and Interpretation}
+\input{}
+
+\chapter{Conclusion}
+\input{}
+
+\chapter{Results Achieved}
+\input{}
+
+\chapter{References}
+\input{}
+
+\chapter{Declaration}
+\input{}
 
 \end{document}
