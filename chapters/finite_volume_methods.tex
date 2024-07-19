@@ -1,9 +1,3 @@
-\documentclass[12pt]{article}
-% \usepackage[utf8]{inputenc} 
-\usepackage{amsmath}
-\usepackage{amsfonts}
-\usepackage{graphicx}
-\begin{document}
 \section{Finite Volume Methods}
 \subsection{Motivation for Finite Volume Method}
 In finite difference methods, the derivatives are approximated by finite differences -- esssentially using Taylor expansion. A large discussion on finite difference  methods shows that they need the solution to be smooth and equation to be satisfied point-wise. However, the solutions to the scalar conservation law (\ref{1}) are not necessarily smooth, so the Taylor expansion -- replacing derivatives using finite differences -- is no longer valid. Hence, we need a new framework for designing numerical methods for scalar conservation laws.
@@ -96,5 +90,3 @@ From eq (\ref{9}), we can write $ u_t = -au_x$ and for $u_{tt}$ we can different
 \begin{equation}
     u_{tt} = 
 \end{equation}
-
-\end{document}
