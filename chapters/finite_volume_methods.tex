@@ -1,17 +1,67 @@
-\section[Finite Volume]{Finite Volume Methods}
+\section{Finite Difference Method} \label{fdm}
+In this section the finite difference method for solving partial differential equations (PDEs) will be presented. A finite difference method consists of the following steps:
+\begin{enumerate}
+    \item Discretize the domain on which the equation is defined.
+    \item For each grid point, replace the derivatives with an approximation, using the values in neighbouring grid points.
+    \item Solve the resulting system of equations.
+\end{enumerate}
+There are set of approximations that are used to approximate the derivative. These includes-\\
+For first derivative $f'$:
+\begin{equation} \label{eqfdm}
+f'(x)\approx 
+\begin{cases}
+    \frac{f(x+h) - f(x)}{h}, & \text{Forward difference }\\
+    \frac{f(x) - f(x-h)}{h}, & \text{Backward difference} \\
+    \frac{f(x+h) - f(x-h)}{2h}, & \text{Central difference.}
+\end{cases}
+\end{equation}
+The commonly used approximation to second derivative $f''(x)$ is-
+\begin{equation} \label{eqdouble}
+    f''(x) \approx \frac{f(x+h) - 2f(x) + f(x-h)}{h^2}
+\end{equation}
+Now, we will see the approach to numerically solve a time-dependent PDE using finite difference methods.
+\subsection{Semi-discretization}
+This technique is used to discretize the time dependent PDEs. The word {\em semi} is to describe the notion that the PDE will first be discretize in space using finite difference methods and then some time marching schemes such as Runge-Kutta methods, Lax-Wendroff method etc., will be used to move forward in time. We will show this for a linear advection equation in 1D mesh
+\begin{equation} \label{1}
+    u_t + f(u)_x = 0
+\end{equation}
+In order to discretize the second derivaitve in above equation, we will use central differences-
+\begin{equation} \label{eq 2}
+    \frac{\partial u}{\partial t} = -\frac{f(x+h) - f(x-h)}{2h}
+\end{equation}
+The eq (\ref{eq 2}) is called semi-discretize form of the linear advection equation. In the next section, we will be using classical Lax-Wendroff method as our time marching scheme.
+\subsection{Classical Lax-Wendroff method}
+Lax-Wendroff schemes are used for numerically solving conservation law or a system of hyperbolic conservation laws. These methods belongs to the class of conservative schemes and can be derived in various ways. For simplicity, we will derive the method by using model given in equation (\ref{1}), namely the linear advection equation with $f(u)=au$, where $a$ is a constant propagation velocity. We can use Taylor expansion of $u_j^{n+1}$
+\begin{equation*}
+    u_j^{n+1} = u_j^n + \Delta t \frac{\partial u}{\partial t}\bigg\vert_j^n + \frac{(\Delta t)^2}{2} \frac{\partial^2 u}{\partial t^2}\bigg\vert_j^n + O(\Delta t^3)
+\end{equation*}
+It is a secong order accurate method since we are retaining terms till second order. From the equation (\ref{1}), we get by differentiation\\
+\begin{minipage}{0.5\textwidth}
+\begin{equation*}
+    \frac{\partial u}{\partial t}\bigg \vert_j^n = -a\frac{\partial u}{\partial x}\bigg \vert_j^n \\
+\end{equation*}
+\end{minipage} \hspace{-40pt} and \hspace{-40pt}
+\begin{minipage}{0.5\textwidth}
+\begin{equation*}
+    \frac{\partial^2 u}{\partial t^2}\bigg \vert_j^n = -a^2\frac{\partial^2 u}{\partial x^2}\bigg \vert_j^n 
+\end{equation*}
+\end{minipage}\\
+We can use central difference from equation(\ref{eqfdm}) and from equation(\ref{eqdouble}) and the final result will be
+\begin{align*}
+    u_j^{n+1} &= u_j^n - a\Delta t \left(\frac{u_{j+1}^n - u_{j-1}^n}{2\Delta x}\right) - a\frac{(\Delta t)^2}{2} \left(\frac{u_{j+1}^n - 2u_j^n + u_{j-1}^n}{(\Delta x)^2}\right)\\ \\
+    u_j^{n+1} &= u_j^n -\frac{a}{2}\frac{\Delta t}{\Delta x}\left(\frac{u_{j+1}^n - u_{j-1}^n}{2\Delta x}\right) - \frac{a}{2}\left(\frac{\Delta t}{\Delta x}\right)^2 \left(\frac{u_{j+1}^n - 2u_j^n + u_{j-1}^n}{(\Delta x)^2}\right)
+\end{align*}
+This is the update step for Lax-Wendroff. Later, we will see in section \ref{cfl}, how to calculate $\Delta t$ using CFL condition which is a needed but not a sufficient condition for stability of the scheme. The {\ttfamily Julia} implementation of this scheme is shown in the section \ref{i} of chapter \ref{am}.
+\section{Finite Volume Methods}
 \subsection{Motivation for Finite Volume Method}
 In finite difference methods, the derivatives are approximated by finite differences -- esssentially using Taylor expansion. A large discussion on finite difference  methods shows that they need the solution to be smooth and equation to be satisfied point-wise. However, the solutions to the scalar conservation law (\ref{1}) are not necessarily smooth, so the Taylor expansion -- replacing derivatives using finite differences -- is no longer valid. Hence, we need a new framework for designing numerical methods for scalar conservation laws.
 
- This chapter introduces the finite volume method for the numerical solution of hyperbolic PDE and system of hyperbolic PDEs. We will talk about fundamental concept of this method and also discuss a type of numerical flux. 
+This section introduces the finite volume method for the numerical solution of hyperbolic PDE and system of hyperbolic PDEs. We will talk about fundamental concept of this method and also discuss a type of numerical flux. 
 
 \subsection{Formulation for conservation laws}
 The basic difference between finite difference methods and finite volume methods is that finite volume methods are derived on the basis of integral form of the conservation laws, instead of the differential form as in finite differences.
 
-For the case of one spatial dimension:
-\begin{equation} \label{1}
-u_t + f(u)_x = 0
-\end{equation}
-the domain is divided into finite volumes (or \textit{grid cells/intervals}) and we need to monitor the approximation to the integral of $u$ over each of these volumes. For each time step, we need to update $u$ using the approximation to the flux $f(u)$ that comes in and goes out from the boundary of these volumes.
+For the case of one spatial dimension as in eq (\ref{1}) the domain is divided into finite volumes (or \textit{grid cells/intervals}) and we need to monitor the approximation to the integral of $u$ over each of these volumes. For each time step, we need to update $u$ using the approximation to the flux $f(u)$ that comes in and goes out from the boundary of these volumes.
 
 If we denote $i$ th volume by:
 \begin{equation}
@@ -71,12 +121,12 @@ At every time level, the cell averages define a superposition of $Riemann$ probl
 \begin{equation} \label{8}
 v = \frac{\Delta t}{\Delta x} \max_p\mid\lambda^p\mid
 \end{equation}
-where $\lambda$'s are the $eigenvalues$ of a matrix $A$, in the case of system of linear hyperbolic equations and $\lambda$ can be the wave propogation speed in the case of a single hyperbolic PDE.
+where $\lambda$'s are the $eigenvalues$ of a matrix $A$ in the case of system of linear hyperbolic equations and $\lambda$ can be the wave propogation speed in the case of a single hyperbolic PDE.
 
 For a three point stencil the CFL condition leads to $v \leq 1$. It can be noted that for a wider stencils, the CFL condition can give $v \leq 2$. The CFL condition is a $necessary$ but not a sufficient condition for stability of the solution.
 \subsection{Rusanov's flux}
 Rusanov scheme \cite{rusanov} is also called {\em local Lax-Friedrich scheme} \cite{notes_ncm} because it can be obtained from a simple modification in {\em Lax-Friedrich scheme} basically using different approach in choosing the parameter $\lambda$. \vspace{8pt}
-\hrule \vspace{10pt}
+\hrule \vspace{8pt}
 \hspace{-17pt}\textbf{A Note about Lax-Friedrich scheme}\\
 Lax-Friedrich scheme has this structure:
 \begin{equation}
@@ -84,7 +134,7 @@ Lax-Friedrich scheme has this structure:
 \end{equation} 
 The time step must satisfy the CFL condition \ref{cfl}, we can write time step $\Delta t$ as:
 \begin{equation*}
-    \Delta t = CFL\frac{\Delta x}{\max\limits_{j} \sigma(f'(u_j^n))}, \hspace{10pt} CFL \leq 1
+    \Delta t = \text{CFL}\frac{\Delta x}{\max\limits_{j} \sigma(f'(u_j^n))}, \hspace{10pt} CFL \leq 1
 \end{equation*}
 where $\sigma$ is the {\em spectral radius}. We see that
 \begin{equation*}
@@ -101,20 +151,79 @@ where $\lambda_{j+1/2}$ is an estimate of the maximum wave speed arising in the 
     \lambda_{j+1/2} = \max\{|u_j| + a_j, |u_{j+1}| + a_{j+1}\}
 \end{equation*} is a good choice.
 
-\subsection{Flux Reconstruxtion}
+\section{Flux Reconstruction}
+The flux reconstruction (FR) method is a class of discontinuous Spectral Element Method for the discretization of conservation laws. FR method utilizes a nodal basis which is usually based on some solution points like Gauss point etc., to approximate the solution with piecewise polynomials inside the element. The main idea is to constuct a continuous approximation of flux utilizing a numerical flux (discontinuous) at the cell interfaces and a {\em correction function}. The solution at the nodes is then updated by a collocation scheme in combination with a Runge-Kutta method.
 
+The choice of the correction function affects the accuracy and stability of the method. FR method can be shown to be equivalent to some discontinuous Galerkin and spectral difference schemes, using a proper choice of solution points and correction function, as shown in \cite{trojak, hyunh}. The quadrature-free nature of FR method together with the ability to cast the operations as matrix-vector operations makes these methods to be performed efficiently on modern vector processors \cite{vincent}.
 
-\subsection{Lax-Wendroff method}
-Lax-wendroff method is a numerical method for solving system of hyperbolic conservation laws. It is a second order accurate method in both space and time. This method can be derived using
-$Taylor's~expansion.$ We will demonstrate the derivation of this method for $linear~advection~equation$ in $1$D:
+At some time $t$, we have the piecewise polynomial solution defined; the FR scheme can be explained by the following steps: \\ \\ 
+Considering scalar form of conservation law $ u_t + f(u)_x = 0$ \\
+\textbf{Step 1.} In each element, we contruct a flux approximation by interpolating the flux at the solution points leading to a polynomial of degree $N$, given by
+\begin{equation*}
+    f_h^\delta(\xi,t) = \sum_0^Nf(u_j^e(t))l_j(\xi)
+\end{equation*}
+where $\xi \in [0,1]$ is a point in reference element $[0,1]$
+and $l_j$ is Lagrange polynomial of degree $N$. The above flux is discontinuous flux across the interfaces of the elements. \\ \\
+\textbf{Step 2.} Continuous flux approximation is build by adding correction terms at the element boundaries
+\begin{align*}
+    f_h(\xi,t) = \left[ f_{e-\frac{1}{2}}(t)-f_h^\delta(0,t) \right]g_L(\xi)+ f_h^\delta(\xi,t) + \left[ f_{e+\frac{1}{2}}(t)-f_h^\delta(1,t) \right]g_R(\xi)
+\end{align*}
+where $g_L$, $g_R$ are correction functions at left and right boundary respectively, and 
+\begin{equation*}
+    f_{e+1/2} = f(u_h(x^-_{e+\frac{1}{2}},t),u_h(x^+_{e+\frac{1}{2}},t))
+\end{equation*}
+is a numerical flux that makes the flux unique across the cells.\\ \\
+\textbf{Step 3.} \label{step3} Then we obtain the system of ODE by collocating the PDE at the solution points
+\begin{equation*}
+    \frac{du^e_j}{dt}(t) = -\frac{1}{\Delta x_e}\frac{\partial f_h}{\partial \xi}(\xi_j,t), \hspace{22pt} 0 \leq j \leq N
+\end{equation*}
+which can be solved in time by schemes such as Runge-Kutta.
+\paragraph{Correction functions.} The correction functions $g_L$ and $g_R$ at the left and right boundary respectively, should satisfy few conditions in order to get a working scheme.\\
+\textbf{1.} The end point conditions:
+\begin{align*}
+    \begin{split}
+        g_L(0) = 1,&~~~~~g_R(0) = 0\\
+        g_L(1) = 0,&~~~~~g_R(1) = 1
+    \end{split}
+\end{align*}
+which insure the continuity of the flux at interfaces.\\
+\textbf{2.} They should \textbf{approximate zero} in some sense. This means that they should not add or subtract anything in flux
+\begin{equation*}
+    \int\limits_{x_{e-1/2}}^{x_{e+1/2}}g_L(x) dx = 0
+\end{equation*}
+Two correction functions Radau and g2 are of major interest as they cooresponds to commonly used DG formulations.
+
+\section{Lax-Wendroff method}
+Lax-wendroff method is a numerical method for solving system of hyperbolic conservation laws. This method can be derived using Taylor's expansion. We will also use the PDE to rewrite some of the time derivatives in the expansion as spatial derivaitves. Using Taylor's expansion in time around $t = t_n$, we can write the solution at next time level as
 \begin{equation} \label{9}
-    u_t + au_x = 0
+    u^{n+1} = u^n + \sum\limits_{m=1}^{N+1} \frac{\Delta t^m}{m!}\partial_t^mu^n + O(\Delta t^{N+2})
 \end{equation}
-The $Taylor's~expansion$ in $1$D looks like:
+We are retaining terms up to $O(\Delta t^{N+1})$ so the overall accuracy, in both space and time, is of the order $N+1$. The expected spatial error is expected to be of $O(\Delta x^{N+1})$.
+Using the PDE, $ \partial_t u = -\partial_x f$, we can re-write the time derivatives in terms of spatial derivatives
+\begin{equation*}
+    \partial_t^m u = -\partial_t^{m-1} \partial_xf = -(\partial_t^{m-1}f)_x, \hspace{8pt} m = 1,2 \dots
+\end{equation*}
+Now eq(\ref{9}) becomes
+
+\begin{align*}
+    u^{n+1} &= u^n - \sum\limits_{m=1}^{N+1} \frac{\Delta t^m}{m!}(\partial_t^{m-1}f)_x + O(\Delta t^{N+2})\\
+    &= u^n - \Delta t\left[\sum\limits_{m=0}^N\frac{\Delta t^m}{(m+1)!}\partial_t^mf \right]_x + O(\Delta t^{N+2})
+\end{align*}
+\begin{align}
+    \hspace{-43pt}= u^n - \Delta t\frac{\partial F}{\partial x}(u^n) + O(\Delta t^{N+2}) \label{11}
+\end{align}
+where
+\begin{equation*}
+    F(u) = \sum\limits_{m=0}^N \frac{\Delta t^m}{(m+1)!}\partial_t^mf(u)
+\end{equation*}
+is the approximation to the time average flux as it can be written as average of truncated Taylor's expansion of the flux $f$ in time. 
+
+As the step described in the previous section, we will first reconstruct the time average flux $F$ inside each element by a continous polynomial $F_h(\xi)$ using discontinous flux and correction functions. Then truncating the eq(\ref{11}), the solution at the nodes is update by a collocation scheme as follows
 \begin{equation}
-    u_j^{n+1} = u_j^n + \Delta t \frac{\partial u}{\partial t}\bigg\vert_j^n + \frac{(\Delta t)^2}{2}\frac{\partial^2 u}{\partial t^2}\bigg\vert_j^n + \dots
+    (u_j^e)^{n+1} = (u_j^e)^n - \frac{\Delta t}{\Delta x_e}\frac{dF_h}{d\xi}(\xi_j), \hspace{18pt} 0 \leq j \leq N
 \end{equation}
-From eq (\ref{9}), we can write $ u_t = -au_x$ and for $u_{tt}$ we can differentiate eq (\ref{9}):
-\begin{equation}
-    u_{tt} = 
-\end{equation}
+Above is the single step Lax-Wendroff update scheme for any order of accuracy.
+
+\begin{center}
+    \rule{3cm}{1pt}
+\end{center}

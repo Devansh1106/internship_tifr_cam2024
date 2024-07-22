@@ -1,5 +1,5 @@
-
 \documentclass[12pt]{report}
+\renewcommand\bibname{References}
 \usepackage[a4paper, width=150mm,top=25mm,bottom=25mm]{geometry}
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -8,52 +8,71 @@
 \usepackage[cache=false, outputdir=aux]{minted}
 \usepackage{listings}
 \usepackage{fancyhdr}
+\usepackage{caption}
 \pagestyle{fancy}
 \setlength{\headheight}{14.49998pt}
+% \fancyhead{}
+\fancyhead[L]{\small\leftmark}
+\fancyhead[R]{\small\rightmark}
+\graphicspath{attachments/}
 
 
 \title{
-{\textbf{Internship Report}}\\
-{\large IISER Thiruvananthapuram,}\\{\large Kerala, India}\\{\small by}
+{\textbf{Distributed memory parallelization of Lax-Wendroff method}}\\
+{\large TIFR-CAM,}\\[-5pt]
+{\large Bangalore, India.}\\[1cm]
+{\includegraphics{attachments/tifrlogo.png}}
 }
-\author{Devansh Tripathi\\ [1 cm]{\textbf{Supervisor:}}\\{ Prof. Praveen Chandrashekar}\\{TIFR-CAM,}\\{Bangalore, India}}
-\date{\today}
-\begin{document}
 
+\author{
+    {\textbf{Report by:}}\\Devansh Tripathi\\{IVR No. IMS22090}\\{IISER Thiruvananthapuram,}\\{Kerala, India}\\[1 cm]
+    {Period: June-July, 2024}
+}
+\date{}
+\begin{document}
 \maketitle
 \chapter*{Acknowledgement}
-I would like to ...
+I would like to ..
 
-\title
-\tableofcontents
+\chapter*{\centering\title{Distributed memory parallelization of Lax-Wendroff method}\\[1cm]}
+\author{\centering
+    {\textbf{Author}}\\Devansh Tripathi\\{IISER Thiruvananthapuram,}\\{Kerala, India}\\[4 cm]
+    {\textbf{Supervisor}}\\{ Prof. Praveen Chandrashekar}\\{TIFR-CAM,}\\\hspace{171pt}{Bangalore, India}
+}\\
+
 \chapter*{Aim of the project}
 \input{chapters/aim.tex}
+
+\tableofcontents
 
 \chapter{Introduction}
 \input{chapters/introduction.tex}
 
-\chapter{Theoritical framework} \label{tf}
+\chapter{Theoretical framework} \label{tf}
 \input{chapters/finite_volume_methods.tex}
 
 \chapter{Profile of Organisation}
-\input{}
+\input{chapters/profile.tex}
 
 \chapter{Methodology} \label{m}
-\input{}
+\input{chapters/trixiLW.tex}
 
-\chapter{Analysis and Interpretation} \label{ai}
-\input{}
+\chapter{Alternative Methodology} \label{am}
+\input{chapters/rma.tex}
+
+\chapter{Analysis and Interpretation}\label{ai}
+\input{chapters/analysis.tex}
 
 \chapter{Conclusion} \label{c}
-\input{}
+\input{chapters/conclusion.tex}
 
-\chapter{Results Achieved} \label{ra}
-\input{}
+\chapter{Results} \label{ra}
+\input{chapters/results.tex}
 
-\chapter{References}
+% \chapter*{References}
 \input{chapters/references.tex}
 
-\chapter{Declaration}
-\input{}
+\chapter*{Declaration}
+\input{chapters/declaration.tex}
 
 \end{document}
