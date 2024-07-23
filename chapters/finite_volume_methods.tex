@@ -187,13 +187,13 @@ which can be solved in time by schemes such as Runge-Kutta.
     \end{split}
 \end{align*}
 which insure the continuity of the flux at interfaces.\\
-\textbf{2.} They should \textbf{approximate zero} in some sense. This means that they should not add or subtract anything in flux
-\begin{equation*}
-    \int\limits_{x_{e-1/2}}^{x_{e+1/2}}g_L(x) dx = 0
-\end{equation*}
+\textbf{2.} They should \textbf{approximate zero} in some sense. This means that they should not add or subtract anything in flux inside the element. 
+% \begin{equation*}
+%     \int\limits_{x_{e-1/2}}^{x_{e+1/2}}g_L(x) dx = 0
+% \end{equation*}
 Two correction functions Radau and g2 are of major interest as they cooresponds to commonly used DG formulations.
 
-\section{Lax-Wendroff method}
+\section[LWFR]{Lax-Wendroff Flux Reconstruction}
 Lax-wendroff method is a numerical method for solving system of hyperbolic conservation laws. This method can be derived using Taylor's expansion. We will also use the PDE to rewrite some of the time derivatives in the expansion as spatial derivaitves. Using Taylor's expansion in time around $t = t_n$, we can write the solution at next time level as
 \begin{equation} \label{9}
     u^{n+1} = u^n + \sum\limits_{m=1}^{N+1} \frac{\Delta t^m}{m!}\partial_t^mu^n + O(\Delta t^{N+2})

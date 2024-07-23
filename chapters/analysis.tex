@@ -1,4 +1,4 @@
-\section{Analysis}
+\section{Analysis of results}
 In this project, multi-node parallelization of the existing serial code for simulation of conservation laws have been performed. Multi-node parallelization enables the program to use the capabilities of a server consists of several nodes and each node having various computing units connected with fast interconnects such as {\ttfamily InfiniBand}. Each node also have its own memory hence in order to get access to other process's memory we need to exclusively communicate the information that we want the other process to have access and there comes {\ttfamily MPI} into the picture.
 
 The parallel code has been tested by running two problems: \textbf{Kelvin-Helmholtz instability} and \textbf{isentropic Euler vortex}. The scaling tests for both of these problems have been performed and results are shown.
@@ -57,7 +57,7 @@ Total number of processes = 16
     \centering
     \begin{minipage}{0.5\textwidth}
         \centering
-        \includegraphics[width=0.9\linewidth]{attachments/solution_068877.png}
+        \includegraphics[width=0.9\linewidth]{attachments/isentropic_arpit.png}
         \caption*{(a)}
     \end{minipage}%
     \begin{minipage}{0.5\textwidth}
@@ -65,9 +65,12 @@ Total number of processes = 16
         \includegraphics[width=0.9\linewidth]{attachments/solution_068877_vx.png}
         \caption*{(b)}
     \end{minipage}
-    \caption{Isentropic Vortex using polynomial degree $N = 4$, (a) density plot, (b) velocity in x direction}
+    \caption{Isentropic vortex using polynomial degree $N = 4$, (a) density plot, (b) velocity in x direction}
 \end{figure*}
+\section{Scaling test} \label{st}
 The numbers in speedup and efficiency that we got in results shows a promising hope for the problems of real world involving complex CFD simulations, big data etc., to be simulated using multi-node environment. These results can be improved further with better optimization techniques and utilising the features of modern hardware such as vector processors etc. 
+
+
 \begin{center}
     \rule{3cm}{1pt}
 \end{center}
