@@ -11,14 +11,14 @@ For \textbf{Kelvin-Helmholtz instability}, \\
 Execution time with 1 process: 68230.47 seconds\footnote[3]{All the data has been collected on Dual Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz}\\
 Execution time with 16 process: 5157.72 seconds
 \begin{equation*}
-    \text{Speedup} = \frac{68230.47}{5157.72} = 13.23~~\text{times}
+    \text{Speedup} = \frac{68230.47}{5157.72} = 13.23~\text{times}
 \end{equation*}
 \linebreak
 For \textbf{isentropic Euler vortex},\\
-Execution time with 1 processes: \footnotemark[3] \\
+Execution time with 1 processes: 176760 seconds\footnotemark[3] \\
 Execution time with 16 processes: 14904 seconds
 \begin{equation*}
-    \text{Speedup} = \frac{}{14904} = ~~\text{times}
+    \text{Speedup} = \frac{176760}{14904} = 11.86~\text{times}
 \end{equation*}
 \vspace{10pt}
 \subsection{Efficiency calculation}
@@ -48,16 +48,16 @@ Total number of processes = 16
 \end{figure*}
 
 \hspace{-18pt}For \textbf{isentropic Euler vortex},\\
-Speedup = \\
+Speedup = 11.86\\
 Total number of processes = 16
 \begin{equation*}
-    \text{Efficiency} = \frac{}{16} \times 100 \% =  \%   
+    \text{Efficiency} = \frac{11.86}{16} \times 100 \% =  74.13\%   
 \end{equation*}
-\begin{figure*}[!ht]
+\begin{figure*}[ht]
     \centering
     \begin{minipage}{0.5\textwidth}
         \centering
-        \includegraphics[width=0.9\linewidth]{attachments/isentropic_arpit.png}
+        \includegraphics[width=1.05\linewidth]{attachments/isentropic_arpit.png}
         \caption*{(a)}
     \end{minipage}%
     \begin{minipage}{0.5\textwidth}
@@ -68,8 +68,20 @@ Total number of processes = 16
     \caption{Isentropic vortex using polynomial degree $N = 4$, (a) density plot, (b) velocity in x direction}
 \end{figure*}
 \section{Scaling test} \label{st}
-The numbers in speedup and efficiency that we got in results shows a promising hope for the problems of real world involving complex CFD simulations, big data etc., to be simulated using multi-node environment. These results can be improved further with better optimization techniques and utilising the features of modern hardware such as vector processors etc. 
-
+The numbers in speedup and efficiency that we got in results shows a promising hope for the problems of real world involving complex CFD simulations, big data etc., to be simulated using multi-node environment. These results can be improved further with better optimization techniques and utilising the features of modern hardware such as vector processors etc.\\ 
+The results for scaling test are shown below for both the problems.\\
+\begin{figure*}[!ht]
+    \centering
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{attachments/scaling_vortex.png}
+    \end{minipage}%
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{attachments/scaling_kelvin2.png}
+    \end{minipage}
+    \caption{Scaling results}
+\end{figure*}
 
 \begin{center}
     \rule{3cm}{1pt}
